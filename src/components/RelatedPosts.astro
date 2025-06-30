@@ -1,0 +1,73 @@
+---
+import { getCollection } from 'astro:content';
+import { formatDate } from '@/utils/date';
+
+export interface Props {
+  relatedSlugs: string[];
+}
+
+const { relatedSlugs } = Astro.props;
+
+const allPosts = await getCollection('blog');
+const relatedPosts = allPosts
+  .filter(post => relatedSlugs.includes(post.slug) && !post.data.draft)
+  .slice(0, 3);
+---
+
+{relatedPosts.length > 0 && (
+  <div class="mt-12">
+    <h3 class="text-2xl font-bold text-gray-900 dark:text-white mb-6">Related Posts</h3>
+    
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+      {relatedPosts.map(post => (
+        <article class="group bg-gray-50 dark:bg-gray-800 rounded-lg overflow-hidden hover:shadow-lg transition-all duration-300">
+          {post.data.image && (
+            <div class="aspect-video overflow-hidden">
+              <img 
+                src={post.data.image} 
+                alt={post.data.imageAlt || post.data.title}
+                class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                loading="lazy"
+              />
+            </div>
+          )}
+          
+          <div class="p-4">
+            <div class="text-sm text-gray-500 dark:text-gray-400 mb-2">
+              {formatDate(post.data.publishDate)}
+            </div>
+            
+            <h4 class="font-semibold text-gray-900 dark:text-white mb-2 group-hover:text-primary-600 dark:group-hover:text-primary-400 transition-colors">
+              <a href={`/blog/${post.slug}`} class="stretched-link">
+                {post.data.title}
+              </a>
+            </h4>
+            
+            <p class="text-sm text-gray-600 dark:text-gray-300 line-clamp-2">
+              {post.data.description}
+            </p>
+          </div>
+        </article>
+      ))}
+    </div>
+  </div>
+)}
+
+<style>
+  .line-clamp-2 {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+  
+  .stretched-link::after {
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    z-index: 1;
+    content: "";
+  }
+</style>

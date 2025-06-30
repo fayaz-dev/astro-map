@@ -1,0 +1,166 @@
+---
+import '@/styles/global.css';
+
+export interface Props {
+  title: string;
+  description: string;
+  image?: string;
+  canonicalURL?: string;
+  type?: 'website' | 'article';
+}
+
+const { 
+  title, 
+  description, 
+  image = '/og-default.jpg',
+  canonicalURL = new URL(Astro.url.pathname, Astro.site),
+  type = 'website'
+} = Astro.props;
+
+const siteName = 'Creative Developer Blog';
+const fullTitle = title === siteName ? title : `${title} | ${siteName}`;
+---
+
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="description" content={description} />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <meta name="generator" content={Astro.generator} />
+    
+    <!-- Primary Meta Tags -->
+    <title>{fullTitle}</title>
+    <meta name="title" content={fullTitle} />
+    <meta name="description" content={description} />
+    
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content={type} />
+    <meta property="og:url" content={canonicalURL} />
+    <meta property="og:title" content={fullTitle} />
+    <meta property="og:description" content={description} />
+    <meta property="og:image" content={new URL(image, Astro.url)} />
+    <meta property="og:site_name" content={siteName} />
+    
+    <!-- Twitter -->
+    <meta property="twitter:card" content="summary_large_image" />
+    <meta property="twitter:url" content={canonicalURL} />
+    <meta property="twitter:title" content={fullTitle} />
+    <meta property="twitter:description" content={description} />
+    <meta property="twitter:image" content={new URL(image, Astro.url)} />
+    
+    <!-- Canonical URL -->
+    <link rel="canonical" href={canonicalURL} />
+    
+    <!-- RSS Feed -->
+    <link rel="alternate" type="application/rss+xml" title={siteName} href="/rss.xml" />
+    
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Crimson+Pro:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+    
+    <!-- JSON-LD -->
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "WebSite",
+        "name": "Creative Developer Blog",
+        "url": "https://your-blog.netlify.app",
+        "description": "A creative developer's journey through code, design, and innovation",
+        "author": {
+          "@type": "Person",
+          "name": "Fayaz Ahmed"
+        }
+      }
+    </script>
+  </head>
+  <body class="bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100 transition-colors duration-300">
+    <slot />
+    
+    <!-- Cookie Consent -->
+    <div id="cookie-consent" class="fixed bottom-4 left-4 right-4 md:left-auto md:right-4 md:max-w-sm bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg p-4 transform translate-y-full opacity-0 transition-all duration-300 z-50">
+      <p class="text-sm text-gray-600 dark:text-gray-300 mb-3">
+        We use cookies to enhance your experience. By continuing to visit this site you agree to our use of cookies.
+      </p>
+      <div class="flex gap-2">
+        <button id="accept-cookies" class="px-3 py-1 bg-primary-600 text-white text-sm rounded hover:bg-primary-700 transition-colors">
+          Accept
+        </button>
+        <button id="decline-cookies" class="px-3 py-1 text-gray-600 dark:text-gray-300 text-sm hover:text-gray-800 dark:hover:text-gray-100 transition-colors">
+          Decline
+        </button>
+      </div>
+    </div>
+    
+    <!-- Back to Top -->
+    <button id="back-to-top" class="fixed bottom-8 right-8 w-12 h-12 bg-primary-600 text-white rounded-full shadow-lg opacity-0 pointer-events-none transition-all duration-300 hover:bg-primary-700 hover:scale-110 z-40">
+      <svg class="w-6 h-6 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 10l7-7m0 0l7 7m-7-7v18"></path>
+      </svg>
+    </button>
+    
+    <script>
+      // Cookie consent
+      const cookieConsent = document.getElementById('cookie-consent');
+      const acceptBtn = document.getElementById('accept-cookies');
+      const declineBtn = document.getElementById('decline-cookies');
+      
+      if (!localStorage.getItem('cookieConsent')) {
+        setTimeout(() => {
+          cookieConsent?.classList.remove('translate-y-full', 'opacity-0');
+        }, 1000);
+      }
+      
+      acceptBtn?.addEventListener('click', () => {
+        localStorage.setItem('cookieConsent', 'accepted');
+        cookieConsent?.classList.add('translate-y-full', 'opacity-0');
+      });
+      
+      declineBtn?.addEventListener('click', () => {
+        localStorage.setItem('cookieConsent', 'declined');
+        cookieConsent?.classList.add('translate-y-full', 'opacity-0');
+      });
+      
+      // Back to top
+      const backToTop = document.getElementById('back-to-top');
+      let clickCount = 0;
+      
+      window.addEventListener('scroll', () => {
+        if (window.scrollY > 300) {
+          backToTop?.classList.remove('opacity-0', 'pointer-events-none');
+        } else {
+          backToTop?.classList.add('opacity-0', 'pointer-events-none');
+        }
+      });
+      
+      backToTop?.addEventListener('click', () => {
+        clickCount++;
+        if (clickCount === 5) {
+          // Easter egg - confetti or special animation
+          document.body.style.animation = 'bounceGentle 1s ease-in-out';
+          setTimeout(() => {
+            document.body.style.animation = '';
+          }, 1000);
+          clickCount = 0;
+        }
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      });
+      
+      // Dark mode toggle
+      const darkModeToggle = document.getElementById('dark-mode-toggle');
+      const html = document.documentElement;
+      
+      // Check for saved theme preference or default to 'light'
+      const currentTheme = localStorage.getItem('theme') || 'light';
+      html.classList.toggle('dark', currentTheme === 'dark');
+      
+      darkModeToggle?.addEventListener('click', () => {
+        html.classList.toggle('dark');
+        const theme = html.classList.contains('dark') ? 'dark' : 'light';
+        localStorage.setItem('theme', theme);
+      });
+    </script>
+  </body>
+</html>

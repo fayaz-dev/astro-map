@@ -1,0 +1,164 @@
+---
+import { getCollection } from 'astro:content';
+import { formatDate } from '@/utils/date';
+
+const allPosts = await getCollection('blog');
+const publishedPosts = allPosts
+  .filter(post => !post.data.draft)
+  .sort((a, b) => b.data.publishDate.valueOf() - a.data.publishDate.valueOf());
+
+// Get all unique tags
+const allTags = [...new Set(publishedPosts.flatMap(post => post.data.tags))].sort();
+---
+
+<section class="py-16">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <!-- Tag Filter -->
+    <div class="mb-8">
+      <div class="flex flex-wrap gap-2 justify-center">
+        <button 
+          class="tag-filter active px-4 py-2 rounded-full text-sm font-medium transition-all duration-300 bg-primary-600 text-white"
+          data-tag="all"
+        >
+          All Posts
+        </button>
+        {allTags.map(tag => (
+          <button 
+            class="tag-filter px-4 py-2 rounded-full text-sm font-medium transition-all duration-300 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-primary-100 dark:hover:bg-primary-900 hover:text-primary-800 dark:hover:text-primary-200"
+            data-tag={tag}
+          >
+            #{tag}
+          </button>
+        ))}
+      </div>
+    </div>
+    
+    <!-- Posts Grid -->
+    <div id="posts-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+      {publishedPosts.map((post, index) => (
+        <article 
+          class="post-card group bg-white dark:bg-gray-800 rounded-lg overflow-hidden shadow-sm hover:shadow-lg transition-all duration-300 hover:-translate-y-1"
+          data-tags={post.data.tags.join(',')}
+          style={`animation-delay: ${index * 100}ms`}
+        >
+          {post.data.image && (
+            <div class="aspect-video overflow-hidden">
+              <img 
+                src={post.data.image} 
+                alt={post.data.imageAlt || post.data.title}
+                class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                loading="lazy"
+              />
+            </div>
+          )}
+          
+          <div class="p-6">
+            <div class="flex items-center gap-2 text-sm text-gray-500 dark:text-gray-400 mb-3">
+              <time datetime={post.data.publishDate.toISOString()}>
+                {formatDate(post.data.publishDate)}
+              </time>
+              {post.data.readingTime && (
+                <>
+                  <span>•</span>
+                  <span>{post.data.readingTime} min read</span>
+                </>
+              )}
+            </div>
+            
+            <h3 class="text-xl font-semibold text-gray-900 dark:text-white mb-3 group-hover:text-primary-600 dark:group-hover:text-primary-400 transition-colors">
+              <a href={`/blog/${post.slug}`} class="stretched-link">
+                {post.data.title}
+              </a>
+            </h3>
+            
+            <p class="text-gray-600 dark:text-gray-300 mb-4 line-clamp-3">
+              {post.data.description}
+            </p>
+            
+            <div class="flex flex-wrap gap-2">
+              {post.data.tags.slice(0, 3).map(tag => (
+                <span class="px-2 py-1 bg-primary-100 dark:bg-primary-900 text-primary-800 dark:text-primary-200 rounded text-xs">
+                  #{tag}
+                </span>
+              ))}
+            </div>
+          </div>
+        </article>
+      ))}
+    </div>
+    
+    <!-- No results message -->
+    <div id="no-results" class="hidden text-center py-12">
+      <div class="text-gray-400 mb-4">
+        <svg class="w-16 h-16 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.172 16.172a4 4 0 015.656 0M9 12h6m-6-4h6m2 5.291A7.962 7.962 0 0112 15c-2.34 0-4.29-1.009-5.824-2.562M15 6.306a7.962 7.962 0 00-6 0m6 0V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2.306"></path>
+        </svg>
+      </div>
+      <h3 class="text-xl font-semibold text-gray-600 dark:text-gray-400 mb-2">No posts found</h3>
+      <p class="text-gray-500 dark:text-gray-500">Try selecting a different tag or view all posts.</p>
+    </div>
+  </div>
+</section>
+
+<script>
+  const tagFilters = document.querySelectorAll('.tag-filter');
+  const postCards = document.querySelectorAll('.post-card');
+  const noResults = document.getElementById('no-results');
+  
+  tagFilters.forEach(filter => {
+    filter.addEventListener('click', () => {
+      const selectedTag = filter.getAttribute('data-tag');
+      
+      // Update active state
+      tagFilters.forEach(f => f.classList.remove('active', 'bg-primary-600', 'text-white'));
+      tagFilters.forEach(f => f.classList.add('bg-gray-200', 'dark:bg-gray-700', 'text-gray-700', 'dark:text-gray-300'));
+      
+      filter.classList.add('active', 'bg-primary-600', 'text-white');
+      filter.classList.remove('bg-gray-200', 'dark:bg-gray-700', 'text-gray-700', 'dark:text-gray-300');
+      
+      // Filter posts
+      let visibleCount = 0;
+      
+      postCards.forEach((card, index) => {
+        const cardTags = card.getAttribute('data-tags')?.split(',') || [];
+        const shouldShow = selectedTag === 'all' || cardTags.includes(selectedTag);
+        
+        if (shouldShow) {
+          card.classList.remove('hidden');
+          card.style.animationDelay = `${visibleCount * 100}ms`;
+          card.classList.add('animate-fade-in');
+          visibleCount++;
+        } else {
+          card.classList.add('hidden');
+          card.classList.remove('animate-fade-in');
+        }
+      });
+      
+      // Show/hide no results message
+      if (visibleCount === 0) {
+        noResults?.classList.remove('hidden');
+      } else {
+        noResults?.classList.add('hidden');
+      }
+    });
+  });
+</script>
+
+<style>
+  .line-clamp-3 {
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+  
+  .stretched-link::after {
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    z-index: 1;
+    content: "";
+  }
+</style>

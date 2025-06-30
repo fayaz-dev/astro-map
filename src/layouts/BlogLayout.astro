@@ -1,0 +1,137 @@
+---
+import BaseLayout from './BaseLayout.astro';
+import Header from '@/components/Header.astro';
+import Footer from '@/components/Footer.astro';
+import Breadcrumb from '@/components/Breadcrumb.astro';
+import TableOfContents from '@/components/TableOfContents.astro';
+import ShareButtons from '@/components/ShareButtons.astro';
+import RelatedPosts from '@/components/RelatedPosts.astro';
+import { formatDate } from '@/utils/date';
+
+export interface Props {
+  frontmatter: {
+    title: string;
+    description: string;
+    publishDate: Date;
+    updatedDate?: Date;
+    tags: string[];
+    author: string;
+    image?: string;
+    imageAlt?: string;
+    related?: string[];
+    readingTime?: number;
+  };
+  headings: Array<{
+    depth: number;
+    slug: string;
+    text: string;
+  }>;
+}
+
+const { frontmatter, headings } = Astro.props;
+const { title, description, publishDate, updatedDate, tags, author, image, imageAlt, related, readingTime } = frontmatter;
+
+const breadcrumbItems = [
+  { label: 'Home', href: '/' },
+  { label: 'Blog', href: '/blog' },
+  { label: title, href: Astro.url.pathname }
+];
+---
+
+<BaseLayout title={title} description={description} image={image} type="article">
+  <Header />
+  
+  <main class="min-h-screen">
+    <article class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <Breadcrumb items={breadcrumbItems} />
+      
+      <header class="mb-8">
+        {image && (
+          <img 
+            src={image} 
+            alt={imageAlt || title}
+            class="w-full h-64 md:h-80 object-cover rounded-lg mb-6"
+            loading="lazy"
+          />
+        )}
+        
+        <div class="flex flex-wrap items-center gap-2 text-sm text-gray-600 dark:text-gray-400 mb-4">
+          <time datetime={publishDate.toISOString()}>
+            {formatDate(publishDate)}
+          </time>
+          {updatedDate && (
+            <>
+              <span>•</span>
+              <span>Updated {formatDate(updatedDate)}</span>
+            </>
+          )}
+          <span>•</span>
+          <span>By {author}</span>
+          {readingTime && (
+            <>
+              <span>•</span>
+              <span>{readingTime} min read</span>
+            </>
+          )}
+        </div>
+        
+        <h1 class="text-3xl md:text-4xl lg:text-5xl font-bold text-gray-900 dark:text-gray-100 mb-4 leading-tight">
+          {title}
+        </h1>
+        
+        <p class="text-lg text-gray-600 dark:text-gray-300 mb-6">
+          {description}
+        </p>
+        
+        <div class="flex flex-wrap gap-2 mb-6">
+          {tags.map(tag => (
+            <a 
+              href={`/blog/tags/${tag}`}
+              class="px-3 py-1 bg-primary-100 dark:bg-primary-900 text-primary-800 dark:text-primary-200 rounded-full text-sm hover:bg-primary-200 dark:hover:bg-primary-800 transition-colors"
+            >
+              #{tag}
+            </a>
+          ))}
+        </div>
+        
+        <ShareButtons title={title} url={Astro.url.href} />
+      </header>
+      
+      <div class="grid grid-cols-1 lg:grid-cols-4 gap-8">
+        <div class="lg:col-span-3">
+          <div class="prose prose-lg dark:prose-invert max-w-none">
+            <slot />
+          </div>
+        </div>
+        
+        <aside class="lg:col-span-1">
+          <div class="sticky top-8">
+            <TableOfContents headings={headings} />
+          </div>
+        </aside>
+      </div>
+      
+      <footer class="mt-12 pt-8 border-t border-gray-200 dark:border-gray-700">
+        <div class="flex justify-between items-center mb-8">
+          <a 
+            href="/blog"
+            class="inline-flex items-center gap-2 text-primary-600 dark:text-primary-400 hover:text-primary-700 dark:hover:text-primary-300 transition-colors group"
+          >
+            <svg class="w-5 h-5 transform group-hover:-translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
+            </svg>
+            Back to Blog
+          </a>
+          
+          <ShareButtons title={title} url={Astro.url.href} />
+        </div>
+        
+        {related && related.length > 0 && (
+          <RelatedPosts relatedSlugs={related} />
+        )}
+      </footer>
+    </article>
+  </main>
+  
+  <Footer />
+</BaseLayout>

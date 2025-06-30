@@ -1,0 +1,78 @@
+---
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import Header from '@/components/Header.astro';
+import Footer from '@/components/Footer.astro';
+import BlogGrid from '@/components/BlogGrid.astro';
+import MindMapVisualization from '@/components/MindMapVisualization';
+---
+
+<BaseLayout 
+  title="Blog" 
+  description="Explore articles about web development, design, and creative coding. Discover insights, tutorials, and innovative approaches to building digital experiences."
+>
+  <Header />
+  
+  <main class="min-h-screen">
+    <!-- Hero Section -->
+    <section class="py-16 bg-gradient-to-br from-primary-50 via-white to-secondary-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
+      <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+        <h1 class="text-4xl md:text-5xl lg:text-6xl font-bold text-gray-900 dark:text-white mb-6">
+          Blog
+        </h1>
+        <p class="text-xl md:text-2xl text-gray-600 dark:text-gray-300 mb-8 max-w-2xl mx-auto">
+          Thoughts, tutorials, and explorations in the world of creative development.
+        </p>
+      </div>
+    </section>
+    
+    <!-- Mind Map Section -->
+    <section class="py-16 bg-white dark:bg-gray-800">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="text-center mb-12">
+          <h2 class="text-3xl md:text-4xl font-bold text-gray-900 dark:text-white mb-4">
+            Explore the Mind Map
+          </h2>
+          <p class="text-lg text-gray-600 dark:text-gray-300 max-w-3xl mx-auto">
+            Discover how blog posts connect through an interactive 3D visualization. 
+            Each node represents a post, and connections show relationships through tags and explicit links.
+          </p>
+        </div>
+        
+        <div class="bg-gray-50 dark:bg-gray-900 rounded-lg p-6">
+          <MindMapVisualization 
+            width={800} 
+            height={600} 
+            className="mx-auto"
+            client:load
+          />
+        </div>
+        
+        <div class="mt-8 text-center">
+          <div class="inline-flex items-center gap-4 text-sm text-gray-600 dark:text-gray-400">
+            <div class="flex items-center gap-2">
+              <div class="w-3 h-3 bg-yellow-400 rounded-full"></div>
+              <span>JavaScript</span>
+            </div>
+            <div class="flex items-center gap-2">
+              <div class="w-3 h-3 bg-blue-400 rounded-full"></div>
+              <span>React</span>
+            </div>
+            <div class="flex items-center gap-2">
+              <div class="w-3 h-3 bg-red-400 rounded-full"></div>
+              <span>Design</span>
+            </div>
+            <div class="flex items-center gap-2">
+              <div class="w-3 h-3 bg-teal-400 rounded-full"></div>
+              <span>Tutorial</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+    
+    <!-- Blog Posts Grid -->
+    <BlogGrid />
+  </main>
+  
+  <Footer />
+</BaseLayout>

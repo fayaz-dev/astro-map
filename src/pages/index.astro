@@ -1,0 +1,91 @@
+---
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import Header from '@/components/Header.astro';
+import Footer from '@/components/Footer.astro';
+import HeroSection from '@/components/HeroSection.astro';
+import FeaturedPosts from '@/components/FeaturedPosts.astro';
+---
+
+<BaseLayout 
+  title="Creative Developer Blog" 
+  description="A creative developer's journey through code, design, and innovation. Exploring the intersection of technology and creativity."
+>
+  <Header />
+  
+  <main>
+    <HeroSection />
+    <FeaturedPosts />
+    
+    <!-- About Section -->
+    <section class="py-16 bg-gray-50 dark:bg-gray-900">
+      <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+        <h2 class="text-3xl md:text-4xl font-bold text-gray-900 dark:text-white mb-6">
+          About the Author
+        </h2>
+        <div class="prose prose-lg dark:prose-invert mx-auto">
+          <p>
+            I'm a creative developer passionate about building beautiful, functional, and innovative digital experiences. 
+            Through this blog, I share insights, tutorials, and explorations at the intersection of code, design, and creativity.
+          </p>
+          <p>
+            When I'm not coding, you'll find me exploring new technologies, contributing to open source projects, 
+            or experimenting with interactive art and generative design.
+          </p>
+        </div>
+        <div class="mt-8">
+          <a 
+            href="/about" 
+            class="inline-flex items-center gap-2 px-6 py-3 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors font-medium"
+          >
+            Learn More About Me
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"></path>
+            </svg>
+          </a>
+        </div>
+      </div>
+    </section>
+    
+    <!-- Developer Toolbox -->
+    <section class="py-16 bg-white dark:bg-gray-800">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="text-center mb-12">
+          <h2 class="text-3xl md:text-4xl font-bold text-gray-900 dark:text-white mb-4">
+            Developer Toolbox
+          </h2>
+          <p class="text-lg text-gray-600 dark:text-gray-300 max-w-2xl mx-auto">
+            Technologies and tools I use to bring ideas to life.
+          </p>
+        </div>
+        
+        <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-6">
+          {[
+            { name: 'JavaScript', icon: '🟨' },
+            { name: 'TypeScript', icon: '🔷' },
+            { name: 'React', icon: '⚛️' },
+            { name: 'Astro', icon: '🚀' },
+            { name: 'Three.js', icon: '🎮' },
+            { name: 'Tailwind', icon: '🎨' },
+            { name: 'Node.js', icon: '🟢' },
+            { name: 'Git', icon: '📝' },
+            { name: 'Figma', icon: '🎯' },
+            { name: 'VS Code', icon: '💻' },
+            { name: 'Netlify', icon: '🌐' },
+            { name: 'GitHub', icon: '🐙' }
+          ].map(tool => (
+            <div class="group bg-gray-50 dark:bg-gray-900 rounded-lg p-4 text-center hover:shadow-lg transition-all duration-300 hover:-translate-y-1">
+              <div class="text-3xl mb-2 group-hover:scale-110 transition-transform">
+                {tool.icon}
+              </div>
+              <div class="text-sm font-medium text-gray-700 dark:text-gray-300">
+                {tool.name}
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+  </main>
+  
+  <Footer />
+</BaseLayout>
